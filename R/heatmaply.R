@@ -565,6 +565,7 @@ heatmaply.default <- function(x,
                               node_type = "heatmap",
                               point_size_mat = NULL,
                               point_size_name = "Point size",
+                              hide_dend_axis = FALSE,
                               label_format_fun = function(...) format(..., digits = 4),
                               labRow = NULL, labCol = NULL,
                               custom_hovertext = NULL,
@@ -760,7 +761,8 @@ heatmaply.default <- function(x,
     grid_size = grid_size,
     node_type = node_type,
     point_size_name = point_size_name,
-    label_format_fun = label_format_fun
+    label_format_fun = label_format_fun,
+    hide_dend_axis = hide_dend_axis
   )
 
   # TODO: think more on what should be passed in "..."
@@ -835,6 +837,7 @@ heatmaply.heatmapr <- function(x,
                                point_size_mat = x[["matrix"]][["point_size_mat"]],
                                point_size_name = "Point size",
                                label_format_fun = function(...) format(..., digits = 4),
+                               hide_dend_axis = FALSE,
                                custom_hovertext = x[["matrix"]][["custom_hovertext"]]) {
   node_type <- match.arg(node_type)
   plot_method <- match.arg(plot_method)
@@ -914,8 +917,21 @@ heatmaply.heatmapr <- function(x,
       py <- ggplot(cols, labels = FALSE) + theme_bw() +
         coord_cartesian(expand = FALSE, xlim = xlims) +
         theme_clear_grid_dends
+
+      py <- ggplotly(py, tooltip = "y", dynamicTicks = dynamicTicks) %>%
+          layout(showlegend = FALSE)
+
     } else {
       suppressWarnings(py <- plotly_dend(cols, side = "col"))
+    }
+    if (hide_dend_axis) {
+        py <- py %>% layout(xaxis = list(
+        title = "",
+        zeroline = FALSE,
+        showline = FALSE,
+        showticklabels = FALSE,
+        showgrid = FALSE
+      ))
     }
   }
   if (is.null(rows)) {
@@ -932,8 +948,20 @@ heatmaply.heatmapr <- function(x,
         theme_clear_grid_dends
 
       if (row_dend_left) px <- px + scale_y_reverse()
+
+      px <- ggplotly(px, tooltip = "y", dynamicTicks = dynamicTicks) %>%
+        layout(showlegend = FALSE)
     } else {
       px <- plotly_dend(rows, flip = row_dend_left, side = "row")
+    }
+    if (hide_dend_axis) {
+      px <- px %>% layout(yaxis = list(
+        title = "",
+        zeroline = FALSE,
+        showline = FALSE,
+        showticklabels = FALSE,
+        showgrid = FALSE
+      ))
     }
   }
   # create the heatmap
@@ -1087,14 +1115,6 @@ heatmaply.heatmapr <- function(x,
       textfont = list(color = plotly::toRGB(cellnote_color), size = cellnote_size)
     )
   }
-  if (!is.null(px) && !is.plotly(px)) {
-    px <- ggplotly(px, tooltip = "y", dynamicTicks = dynamicTicks) %>%
-      layout(showlegend = FALSE)
-  }
-  if (!is.null(py) && !is.plotly(py)) {
-    py <- ggplotly(py, tooltip = "y", dynamicTicks = dynamicTicks) %>%
-      layout(showlegend = FALSE)
-  }
 
   # https://plot.ly/r/reference/#Layout_and_layout_style_objects
   p <- layout(
@@ -1175,7 +1195,13 @@ heatmaply.heatmapr <- function(x,
   # keep only relevant plotly options
   l <- config(
     l, displaylogo = FALSE, collaborate = FALSE,
-    modeBarButtonsToRemove = c("sendDataToCloud", "select2d", "lasso2d", "autoScale2d", "hoverClosestCartesian", "hoverCompareCartesian", "sendDataToCloud")
+    modeBarButtonsToRemove = c(
+      "sendDataToCloud",
+      "select2d",
+      "lasso2d",
+      "autoScale2d",
+      "hoverClosestCartesian",
+      "hoverCompareCartesian")
   )
 
   l
