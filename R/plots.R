@@ -57,7 +57,9 @@ ggplot_heatmap <- function(xx,
                            type = c("heatmap", "scatter"),
                            pointsize = 5,
                            point_size_mat = NULL,
-                           label_format_fun = function(...) format(..., digits = 4),
+                           label_format_fun = function(...) {
+                             format(..., digits = 4)
+                           },
                            point_size_name = "Point size",
                            custom_hovertext = NULL,
                            ...) {
@@ -219,12 +221,26 @@ paste_aes <- function(x) {
 }
 
 plotly_heatmap <- function(x, limits = range(x),
-                           colors = viridis(n = 256, alpha = 1, begin = 0, end = 1, option = "viridis"),
-                           row_text_angle = 0, column_text_angle = 45, grid.color, grid.size,
-                           row_dend_left = FALSE, fontsize_row = 10, fontsize_col = 10, key_title = "",
-                           colorbar_xanchor = "left", colorbar_yanchor = "bottom",
+                           colors = viridis(
+                            n = 256, 
+                            alpha = 1,
+                            begin = 0, 
+                            end = 1, 
+                            option = "viridis"),
+                           row_text_angle = 0, 
+                           column_text_angle = 45, 
+                           grid.color, 
+                           grid.size,
+                           row_dend_left = FALSE, 
+                           fontsize_row = 10, 
+                           fontsize_col = 10, 
+                           key_title = "",
+                           colorbar_xanchor = "left", 
+                           colorbar_yanchor = "bottom",
                            label_names = NULL,
-                           colorbar_xpos = 1.1, colorbar_ypos = 1, colorbar_len = 0.3,
+                           colorbar_xpos = 1.1, 
+                           colorbar_ypos = 1, 
+                           colorbar_len = 0.3,
                            custom_hovertext = NULL) {
   if (is.function(colors)) colors <- colors(256)
 
@@ -382,8 +398,11 @@ plotly_dend <- function(dend, side = c("row", "col"), flip = FALSE) {
 #' @return A ggplot geom_tile object
 #'
 ggplot_side_color_plot <- function(df, palette = NULL,
-                                   scale_title = paste(type, "side colors"), type = c("column", "row"),
-                                   text_angle = if (type == "column") 0 else 90, is_colors = FALSE, fontsize,
+                                   scale_title = paste(type, "side colors"), 
+                                   type = c("column", "row"),
+                                   text_angle = if (type == "column") 0 else 90, 
+                                   is_colors = FALSE, 
+                                   fontsize,
                                    label_name = NULL) {
   type <- match.arg(type)
   if (is.matrix(df)) df <- as.data.frame(df)
@@ -487,8 +506,10 @@ default_side_colors <- function(n) {
 
 ## Predict luminosity of cells and change text based on that
 ## http://stackoverflow.com/questions/12043187/how-to-check-if-hex-color-is-too-black
-predict_colors <- function(p, colorscale_df=p$x$data[[1]]$colorscale,
-                           cell_values=p$x$data[[1]]$z, plot_method=c("ggplot", "plotly")) {
+predict_colors <- function(p, colorscale_df = p$x$data[[1]]$colorscale,
+                           cell_values = p$x$data[[1]]$z, 
+                           plot_method = c("ggplot", "plotly")) {
+
   plot_method <- match.arg(plot_method)
 
   cell_values <- as.data.frame(cell_values)
@@ -562,55 +583,6 @@ parse_plotly_color <- function(color) {
 }
 
 
-
-# # Create a plotly colorscale from a list of colors in any format.
-# # Probably not needed currently
-# make_colorscale <- function(colors) {
-#     seq <- seq(0, 1, by = 1 / length(colors))
-#     scale <- list(
-#         sapply(seq_along(colors),
-#           function(i) {
-#             if (i == 1) {
-#                 0
-#             } else if (i == length(colors)) {
-#                 1
-#             } else {
-#                 seq[i]
-#             }
-#           }
-#         ),
-#         col2plotlyrgb(colors)
-#     )
-#     scale
-# }
-
-# #' @title Color to RGB Text
-# #' @description
-# #' Plotly takes colors in this format "rgb(255, 0, 0)"
-# #'
-# #' @param col vector of any of the three kinds of R color specifications,
-# #' i.e., either a color name (as listed by colors()),
-# #' a hexadecimal string of the form "#rrggbb" or "#rrggbbaa" (see rgb),
-# #' or a positive integer i meaning palette()[i].
-# #'
-# #' @return
-# #' A character of the form "rgb(value1,value1,value3)"
-# #'
-# #' @seealso \link{col2rgb}
-# #' @examples
-# #' \dontrun{
-# #' col2rgb("peachpuff")
-# #' col2plotlyrgb("peachpuff")
-# #' }
-# col2plotlyrgb <- function(col) {
-#     rgb <- grDevices::col2rgb(col)
-#     paste0(
-#       "rgb(",
-#       rgb["red", ], ",",
-#       rgb["green", ], ",",
-#       rgb["blue", ], ")"
-#     )
-# }
 
 ## Helper function to generate "normal" colors for dendrograms
 ## ie black if one k or rainbow_hcl otherwise

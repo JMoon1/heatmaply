@@ -414,15 +414,14 @@ heatmapr <- function(x,
   }
   if (!missing(row_side_colors)) {
     if (!(is.data.frame(row_side_colors) | is.matrix(row_side_colors))) {
-      row_side_colors <- data.frame("row_side_colors" = row_side_colors)
+      row_side_colors <- data.frame("Row annotation" = row_side_colors)
     }
     assert_that(nrow(row_side_colors) == nrow(x))
     row_side_colors <- row_side_colors[rowInd, , drop = FALSE]
   }
   if (!missing(col_side_colors)) {
     if (!(is.data.frame(col_side_colors) | is.matrix(col_side_colors))) {
-      col_side_colors <- data.frame(col_side_colors)
-      colnames(col_side_colors) <- "col_side_colors"
+      col_side_colors <- data.frame("Column annotation" = col_side_colors)
     }
     assert_that(nrow(col_side_colors) == ncol(x))
     col_side_colors <- col_side_colors[colInd, , drop = FALSE]
